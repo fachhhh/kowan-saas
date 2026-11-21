@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-5">
+  <div class="card shadow-sm"><div class="card-body p-4">
+    <h4 class="mb-3 text-center">Login</h4>
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <strong>Login gagal:</strong> Nama pengguna atau sandi salah. Jika belum mendaftar, silakan daftar tenant baru terlebih dahulu.
+      </div>
+    {% endif %}
+    <form method="post">{% csrf_token %}
+      <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">Nama Pengguna (Username)</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-3">
+        <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold">Sandi</label>
+        {{ form.password }}
+      </div>
+      <button class="btn btn-primary w-100 py-2">Masuk</button>
+    </form>
+    <p class="mt-3 mb-0 text-center">Belum punya toko? <a href="{% url 'register' %}">Daftar tenant baru</a></p>
+  </div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}Edit Produk{% else %}Tambah Produk{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="mb-3">{% if object %}Edit Produk: {{ object.nama }}{% else %}Tambah Produk Baru{% endif %}</h4>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Batal</a>
+            <button class="btn btn-primary">Simpan Produk</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

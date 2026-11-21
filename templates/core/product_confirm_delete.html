@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Hapus Produk{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6">
+  <div class="card shadow-sm border-danger"><div class="card-body">
+    <h4>Hapus produk?</h4>
+    <p>Anda yakin ingin menghapus <strong>{{ object.nama }}</strong>? Tindakan ini tidak bisa dibatalkan.</p>
+    <form method="post">{% csrf_token %}
+      <button class="btn btn-danger">Ya, hapus</button>
+      <a href="{% url 'product_list' %}" class="btn btn-secondary">Batal</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

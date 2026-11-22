@@ -3,7 +3,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3>Produk {{ user.tenant.nama }}</h3>
-  <a href="{% url 'product_create' %}" class="btn btn-primary">+ Tambah Produk</a>
+  <div class="d-flex gap-2">
+    <form method="post" action="{% url 'product_export' %}" class="m-0">
+      {% csrf_token %}
+      <button class="btn btn-outline-success">Ekspor CSV</button>
+    </form>
+    <a href="{% url 'product_create' %}" class="btn btn-primary">+ Tambah Produk</a>
+  </div>
 </div>
 <div class="card shadow-sm"><div class="table-responsive">
   <table class="table table-hover mb-0 align-middle">

@@ -150,3 +150,6 @@ STORAGES = {
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AWS_REGION = config('AWS_REGION', default='us-east-1')
+EXPORT_LAMBDA_NAME = config('EXPORT_LAMBDA_NAME', default='export-produk-csv')

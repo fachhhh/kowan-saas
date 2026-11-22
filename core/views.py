@@ -11,6 +11,17 @@ from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from .forms import ProductForm, RegisterTenantForm
 from .models import Product
 
+import json
+import logging
+
+import boto3
+from botocore.exceptions import BotoCoreError, ClientError
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.views.decorators.http import require_POST
+
+logger = logging.getLogger(__name__)
 
 def register(request):
     if request.user.is_authenticated:
@@ -74,3 +85,34 @@ class ProductDeleteView(TenantRequiredMixin, DeleteView):
     def form_valid(self, form):
         messages.success(self.request, 'Produk berhasil dihapus.')
         return super().form_valid(form)
+
+@login_required
+@require_POST
+def export_csv(request):
+    tenant = request.user.tenant
+    if tenant is None:
+        return HttpResponseForbidden('Akun ini tidak terhubung ke tenant manapun.')
+
+    # Hanya produk milik tenant sendiri yang dikirim ke Lambda
+    produk = list(
+        Product.objects.filter(tenant=tenant).values('nama', 'harga', 'stok', 'deskripsi')
+    )
+    payload = {'tenant_id': tenant.id, 'tenant_nama': tenant.nama, 'products': produk}
+
+    try:
+        client = boto3.client('lambda', region_name=settings.AWS_REGION)
+        resp = client.invoke(
+            FunctionName=settings.EXPORT_LAMBDA_NAME,
+            InvocationType='RequestResponse',
+            Payload=json.dumps(payload).encode('utf-8'),
+        )
+        hasil = json.loads(resp['Payload'].read())
+        if resp.get('FunctionError') or hasil.get('statusCode') != 200:
+            raise RuntimeError(f'Lambda mengembalikan error: {hasil}')
+        url = json.loads(hasil['body'])['url']
+    except (BotoCoreError, ClientError, RuntimeError, ValueError, KeyError):
+        logger.exception('Gagal ekspor CSV untuk tenant %s', tenant.id)
+        messages.error(request, 'Gagal membuat file ekspor. Silakan coba lagi.')
+        return redirect('product_list')
+
+    return HttpResponseRedirect(url)
